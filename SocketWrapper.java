@@ -5,7 +5,7 @@ public class SocketWrapper {
 
   int port;
   private ServerSocket serverSocket;
-
+  private Socket response;
 
   public SocketWrapper(int p) {
     port = p;
@@ -14,27 +14,27 @@ public class SocketWrapper {
   public void setupSocket() {
     try {
       serverSocket = new ServerSocket(port);
-      Socket clientSocket = serverSocket.accept();
-      //System.out.println(clientSocket.getOutputStream());
-      interperateSocket(clientSocket);
+      response = serverSocket.accept();
     }
     catch(IOException e) {
-      System.out.println("yep");
+      System.out.println("something went wrong");
     }
   }
 
-  private void interperateSocket(Socket clientSocket) {
+  public void interperateSocket() {
     try {
-      PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-      BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      PrintWriter out = new PrintWriter(response.getOutputStream(), true);
+      BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
 
       String inputLine;
-      while ((inputLine = in.readLine()) != null) {
-        out.println(inputLine);
+      while ((inputLine = in.readLine()) != null && inputLine.length()>3) {
+        System.out.println(inputLine);
+        inputLine = "HTTP/1.0 200 Success\r\n\r\n" + inputLine;
+        out.println(inputLine + "!");
       }
     }
     catch(IOException e) {
-      System.out.println("idk");
+      System.out.println("something went wrong");
     }
   }
 
