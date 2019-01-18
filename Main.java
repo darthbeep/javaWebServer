@@ -1,0 +1,10 @@
+import java.net.*;
+import java.io.*;
+
+public class Main {
+  public static void main(String[] args) {
+    System.out.println("hi");
+    SocketWrapper s = new SocketWrapper(8000);
+    s.setupSocket();
+  }
+}
