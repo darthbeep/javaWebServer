@@ -1,5 +1,7 @@
 import java.net.*;
 import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
 public class SocketWrapper {
 
@@ -11,6 +13,7 @@ public class SocketWrapper {
   BufferedReader in;
 
   String header;
+  String filestart="public_html";
 
   public SocketWrapper(int p) {
     port = p;
@@ -41,17 +44,41 @@ public class SocketWrapper {
         out.println("HTTP/1.0 501 Not Implemented\r\n\r\n<html><body><h1>501 Not Implemented</h1></body></html>");
       }
       else if (!args[1].subSequence(0, 1).equals("/")) {
-        out.println("HTTP/1.0 400 Bad Request\r\n\r\n<html><body><h1>501 Bad Request</h1></body></html>");
+        out.println("HTTP/1.0 400 Bad Request\r\n\r\n<html><body><h1>400 Bad Request</h1></body></html>");
       }
       else {
-        out.println("HTTP/1.0 200 OK\r\n\r\n");
-        out.println("This is a webpage");
+
+        try {
+          Path fp = Paths.get(convertToPath(args[1]));
+          Scanner s = new Scanner(fp);
+          String contents = "";
+          while (s.hasNextLine()) {
+            contents += s.nextLine();
+          }
+          out.println("HTTP/1.0 200 OK\r\n\r\n");
+          out.println(contents);
+          s.close();
+        } catch(FileNotFoundException e) {
+          out.println("HTTP/1.0 404 Not Found\r\n\r\n<html><body><h1>404 Not Found</h1></body></html>");
+        }
+        catch (Exception e) {
+          System.out.println(e);
+        }
       }
       out.close();
-      for (String a : args) {
-        System.out.println(a);
-      }
   }
 
+  public String convertToPath(String givenPath) throws IOException {
+    String ret = filestart + givenPath;
+    int len = ret.length();
+    if (ret.substring(len-1).equals("/")) {
+      ret = ret.substring(0, len-1);
+    }
+    File exist = new File(ret);
+    if (exist.exists() && Files.probeContentType(exist.toPath()) == null) {
+      ret+="/index.html";
+    }
+    return ret;
+  }
 
 }
