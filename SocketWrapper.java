@@ -53,16 +53,17 @@ public class SocketWrapper {
           Scanner s = new Scanner(fp);
           String contents = "";
           while (s.hasNextLine()) {
-            contents += s.nextLine();
+            contents += s.nextLine()+"\r\n";
           }
-          out.println("HTTP/1.0 200 OK\r\n\r\n");
-          out.println(contents);
+          System.out.println(contents);
+          out.println("HTTP/1.0 200 OK\r\nhi\r\n");
+        //  System.out.println(contents);
+          out.print(contents);
           s.close();
         } catch(FileNotFoundException e) {
           out.println("HTTP/1.0 404 Not Found\r\n\r\n<html><body><h1>404 Not Found</h1></body></html>");
         }
         catch (Exception e) {
-          System.out.println(e);
         }
       }
       out.close();
